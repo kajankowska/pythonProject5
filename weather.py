@@ -1,6 +1,7 @@
 import sys
 import requests
 import datetime
+import json
 
 key = sys.argv[1]
 weatherdate = sys.argv[2]
@@ -28,11 +29,18 @@ def api_data_downloading():
     return newdata
 
 
+def save_response(file):
+    rowdata = response.json()
+    with open(file, "w") as file:
+        file_content_json = json.dumps(rowdata)
+        file.write(file_content_json)
+    return True
+
+
 def proper_day():
     difference = datetime.datetime.strptime(sys.argv[2], "%Y-%m-%d").date() - datetime.datetime.today().date()
     if difference.days > 16 or difference.days < 0:
         print("Date outside the range.")
-        pass
     else:
         print("The weather forecast will be checked.")
 
@@ -46,6 +54,6 @@ def weather_check():
         print("It won't rain.")
 
 
-print(proper_day())
-print(api_data_downloading())
-print(weather_check())
+# print(proper_day())
+# print(api_data_downloading())
+# print(weather_check())
