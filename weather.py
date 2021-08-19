@@ -1,14 +1,21 @@
 import sys
+import time
 import requests
 import datetime
 import json
 
 key = sys.argv[1]
 weatherdate = sys.argv[2]
+today = datetime.date.today()
+unixdate = datetime.datetime.strptime(weatherdate, "%Y-%m-%d")
+unixdate = time.mktime(unixdate.timetuple())
+
 newdata = {}
 
 
-def api_data_downloading():
+with open("weather.json", "a") as file:
+    file.write("")
+
     url = "https://community-open-weather-map.p.rapidapi.com/forecast/daily"
 
     querystring = {"q": "Warszawa", "lat": "35", "lon": "139", "cnt": "16", "units": "metric or imperial"}
@@ -26,34 +33,24 @@ def api_data_downloading():
         dt = data["dt"]
         weather = data["weather"][0]["main"]
         newdata[dt] = weather
-    return newdata
 
 
-def save_response(file):
-    rowdata = response.json()
-    with open(file, "w") as file:
-        file_content_json = json.dumps(rowdata)
-        file.write(file_content_json)
-    return True
+with open("weather.json", "a", newline="") as file:
+    file.write(json.dumps(response.json()))
 
 
-def proper_day():
-    difference = datetime.datetime.strptime(sys.argv[2], "%Y-%m-%d").date() - datetime.datetime.today().date()
-    if difference.days > 16 or difference.days < 0:
-        print("Date outside the range.")
-    else:
-        print("The weather forecast will be checked.")
+difference = datetime.datetime.strptime(sys.argv[2], "%Y-%m-%d").date() - datetime.datetime.today().date()
+if difference.days > 16 or difference.days < 0:
+    print("Date outside the range.")
+else:
+    print("The weather forecast will be checked.")
 
 
-def weather_check():
-    if weatherdate in newdata == "Rain":
-        print("It will rain.")
-    if weatherdate in newdata == "Clouds":
-        print("I don't know (if it will rain).")
-    if weatherdate in newdata == "Clear":
-        print("It won't rain.")
-
-
-# print(proper_day())
-# print(api_data_downloading())
-# print(weather_check())
+for k, v in newdata.items():
+    if k >= unixdate:
+        if k == "Rain":
+            print("It will rain.")
+        if k == "Clouds":
+            print("I don't know (if it will rain).")
+        if k == "Clear":
+            print("It won't rain.")
