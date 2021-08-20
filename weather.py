@@ -6,12 +6,14 @@ import json
 
 key = sys.argv[1]
 weatherdate = sys.argv[2]
-today = datetime.date.today()
-unixdate = datetime.datetime.strptime(weatherdate, "%Y-%m-%d")
-unixdate = time.mktime(unixdate.timetuple())
+
+start = datetime.datetime.strptime(weatherdate, "%Y-%m-%d")
+start_date = time.mktime(start.timetuple())
+end = start + datetime.timedelta(days=1)
+end_date = time.mktime(end.timetuple())
+
 
 newdata = {}
-
 
 with open("weather.json", "a") as file:
     file.write("")
@@ -47,10 +49,10 @@ else:
 
 
 for k, v in newdata.items():
-    if k >= unixdate:
-        if k == "Rain":
+    if k > start_date and k < end_date:
+        if v == "Rain":
             print("It will rain.")
-        if k == "Clouds":
+        if v == "Clouds":
             print("I don't know (if it will rain).")
-        if k == "Clear":
+        if v == "Clear":
             print("It won't rain.")
