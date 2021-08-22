@@ -27,6 +27,10 @@ class WeatherForecast:
         rowdata = response.json()
         return rowdata
 
+    def file_open(self):
+        with open("weather.json", "a") as file:
+            file.write("")
+
     def dict_save(self, rowdata):
         for data in rowdata["list"]:
             dt = data["dt"]
@@ -62,10 +66,35 @@ class WeatherForecast:
     def run(self):
         self.validate()
         data = self.get_api_data()
+        self.file_open()
         self.dict_save(data)
         self.file_save(data)
         self.summary()
+        self.__iter__()
+
+    def __getitem__(self, item):
+        pass
+
+    def __iter__(self):
+        return iter(self.newdata)
+
 
 key = sys.argv[1]
+today = datetime.date.today()
+date = today + datetime.timedelta(days=1)
 weatherdate = sys.argv[2]
-wf = WeatherForecast(key, weatherdate)
+
+if len(sys.argv) == 3:
+    terminal = sys.argv[2]
+    weatherdate = datetime.datetime.strptime(terminal, "%Y-%m-%d").strftime("%Y-%m-%d")
+if len(sys.argv) == 2:
+    weatherdate = date
+
+
+wf = WeatherForecast(key, weatherdate)  # answer about the weather for the given date
+# wf.items() ==  # tuple generator for retained results when calling
+wf_iter = WeatherForecast(key, weatherdate)  # iterator returning all dates the weather is known
+for k in wf:
+    k = datetime.datetime.fromtimestamp(int(k)).strftime("%Y-%m-%d")
+    print(k)
+    
