@@ -5,7 +5,13 @@ import datetime
 import json
 
 key = sys.argv[1]
-weatherdate = sys.argv[2]
+
+if len(sys.argv) < 3:  # if the date is not specified, the next day is selected
+    d = datetime.datetime.today().date()
+    date = d + datetime.timedelta(days=1)
+    weatherdate = str(date)
+else:
+    weatherdate = sys.argv[2]
 
 start = datetime.datetime.strptime(weatherdate, "%Y-%m-%d")
 start_date = time.mktime(start.timetuple())
@@ -15,7 +21,7 @@ end_date = time.mktime(end.timetuple())
 
 newdata = {}
 
-with open("weather.json", "a") as file:
+with open("fcst.json", "a") as file:
     file.write("")
 
     url = "https://community-open-weather-map.p.rapidapi.com/forecast/daily"
@@ -37,11 +43,11 @@ with open("weather.json", "a") as file:
         newdata[dt] = weather
 
 
-with open("weather.json", "a", newline="") as file:
+with open("fcst.json", "a", newline="") as file:
     file.write(json.dumps(response.json()))
 
 
-difference = datetime.datetime.strptime(sys.argv[2], "%Y-%m-%d").date() - datetime.datetime.today().date()
+difference = datetime.datetime.strptime(weatherdate, "%Y-%m-%d").date() - datetime.datetime.today().date()
 if difference.days > 16 or difference.days < 0:
     print("Date outside the range.")
 else:
