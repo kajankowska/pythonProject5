@@ -107,4 +107,4 @@ else:
 
 
 wf_date = WeatherForecast(key, weatherdate)  # answer about the weather for the given date (weatherdate)
-# wf.items() =  # tuple generator for retained results when calling
+wf.items() =  # tuple generator for retained results when calling
