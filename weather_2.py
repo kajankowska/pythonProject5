@@ -2,7 +2,6 @@ import sys
 import time
 import requests
 import datetime
-import json
 
 
 class WeatherForecast:
@@ -27,9 +26,9 @@ class WeatherForecast:
         rowdata = response.json()
         return rowdata
 
-    def file_open(self):
-        with open("weather.json", "a") as file:
-            file.write("")
+    def edit_file(self):
+        with open("forecast.txt", "a") as file:
+            file.write(f"{weatherdate}\n")
 
     def dict_save(self, rowdata):
         for data in rowdata["list"]:
@@ -45,11 +44,24 @@ class WeatherForecast:
         else:
             print("The weather forecast will be checked.")
 
-    def file_save(self, data):
-        with open("weather.json", "a", newline="") as file:
-            file.write(json.dumps(data))
+    def file_summary(self):
+        f = open("forecast.txt", "r")
+        for weatherdate in f:
+            start = datetime.datetime.strptime(self.weatherdate, "%Y-%m-%d")
+            start_date = time.mktime(start.timetuple())
+            end = start + datetime.timedelta(days=1)
+            end_date = time.mktime(end.timetuple())
+            for k, v in self.newdata.items():
+                if k > start_date and k < end_date:
+                    if v == "Rain":
+                        print("It will rain.")
+                    if v == "Clouds":
+                        print("I don't know (if it will rain).")
+                    if v == "Clear":
+                        print("It won't rain.")
+            return weatherdate
 
-    def summary(self):
+    def api_summary(self):
         start = datetime.datetime.strptime(self.weatherdate, "%Y-%m-%d")
         start_date = time.mktime(start.timetuple())
         end = start + datetime.timedelta(days=1)
@@ -66,35 +78,33 @@ class WeatherForecast:
     def run(self):
         self.validate()
         data = self.get_api_data()
-        self.file_open()
+        self.edit_file()
         self.dict_save(data)
-        self.file_save(data)
-        self.summary()
+        self.file_summary()
+        self.api_summary()
         self.__iter__()
+        self.__getitem__()
 
-    def __getitem__(self, item):
+    def __getitem__(self):
+        self.weatherdate = datetime.datetime.strptime(weatherdate, "%Y-%m-%d").date()
         pass
 
-    def __iter__(self):
+    def __iter__(self):  # iterator returning all dates the weather is known
+        for k in self.newdata.keys():
+            k = datetime.datetime.fromtimestamp(int(k)).strftime("%Y-%m-%d")
+            print(k)
         return iter(self.newdata)
 
 
 key = sys.argv[1]
-today = datetime.date.today()
-date = today + datetime.timedelta(days=1)
-weatherdate = sys.argv[2]
 
-if len(sys.argv) == 3:
-    terminal = sys.argv[2]
-    weatherdate = datetime.datetime.strptime(terminal, "%Y-%m-%d").strftime("%Y-%m-%d")
-if len(sys.argv) == 2:
-    weatherdate = date
+if len(sys.argv) < 3:  # if the date is not specified, the next day is selected
+    d = datetime.datetime.today().date()
+    date = d + datetime.timedelta(days=1)
+    weatherdate = str(date)
+else:
+    weatherdate = sys.argv[2]
 
 
-wf = WeatherForecast(key, weatherdate)  # answer about the weather for the given date
-# wf.items() ==  # tuple generator for retained results when calling
-wf_iter = WeatherForecast(key, weatherdate)  # iterator returning all dates the weather is known
-for k in wf:
-    k = datetime.datetime.fromtimestamp(int(k)).strftime("%Y-%m-%d")
-    print(k)
-    
+wf_date = WeatherForecast(key, weatherdate)  # answer about the weather for the given date (weatherdate)
+# wf.items() =  # tuple generator for retained results when calling
