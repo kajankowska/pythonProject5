@@ -80,19 +80,18 @@ class WeatherForecast:
         data = self.get_api_data()
         self.edit_file()
         self.dict_save(data)
-        self.file_summary()
         self.api_summary()
-        self.__iter__()
-        self.__getitem__()
+        self.items()
 
-    def __getitem__(self):
-        self.weatherdate = datetime.datetime.strptime(weatherdate, "%Y-%m-%d").date()
-        pass
+    def items(self):
+        for k, v in self.newdata.items():
+            k = datetime.datetime.fromtimestamp(k).strftime("%Y-%m-%d")
+            yield k, v
 
-    def __iter__(self):  # iterator returning all dates the weather is known
-        for k in self.newdata.keys():
-            k = datetime.datetime.fromtimestamp(int(k)).strftime("%Y-%m-%d")
-            print(k)
+    def __getitem__(self, item):
+        return self.newdata[item]
+
+    def __iter__(self):
         return iter(self.newdata)
 
 
@@ -106,5 +105,12 @@ else:
     weatherdate = sys.argv[2]
 
 
-wf_date = WeatherForecast(key, weatherdate)  # answer about the weather for the given date (weatherdate)
-wf.items() =  # tuple generator for retained results when calling
+wf = WeatherForecast(key, weatherdate)  # answer about the weather for the given date (weatherdate)
+
+for i in wf.items():  # tuple generator for retained results when calling
+    print(i)
+
+for i in wf:  # iterator returning all dates the weather is known
+    i = datetime.datetime.fromtimestamp(i).strftime("%Y-%m-%d")
+    print(i)
+
